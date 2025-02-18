@@ -1,5 +1,6 @@
 Useful Commands:
         - pip freeze > requirements.txt
+           - Adds all dependencies in venv to requirements.txt
         - git branch -M dev
         - MacOS:
            - source venv/bin/activate
@@ -7,4 +8,14 @@ Useful Commands:
            - venv\Scripts\activate
 
         - pip install -r requirements.txt
-        
+           - Installs all dependencies in requirements.txt
+
+        - flask run
+           - Runs the Flask application
+           
+        - Creating venv:
+           - python3 -m venv venv
+           - source venv/bin/activate
+           - pip install -r requirements.txt
+           
+           
