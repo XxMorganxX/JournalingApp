@@ -12,6 +12,9 @@ Useful Commands:
 
         - flask run
            - Runs the Flask application
+
+        - Run FastAPI:
+           - uvicorn server:app --reload 
            
         - Creating venv:
            - python3 -m venv venv
