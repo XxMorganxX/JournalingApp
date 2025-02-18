@@ -1,0 +1,10 @@
+Useful Commands:
+        - pip freeze > requirements.txt
+        - git branch -M dev
+        - MacOS:
+           - source venv/bin/activate
+        - Windows:
+           - venv\Scripts\activate
+
+        - pip install -r requirements.txt
+        

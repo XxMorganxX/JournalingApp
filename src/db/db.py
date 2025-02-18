@@ -1,9 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-
-
-
 db = SQLAlchemy()
 
 class User(db.Model):
@@ -33,6 +30,7 @@ class JournalEntry(db.Model):
     __tablename__ = "journal_entries"
     __table_args__ = {'sqlite_autoincrement': True}
     
+    
     entry_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     datetime_created = db.Column(db.DateTime, nullable=False)
@@ -48,7 +46,8 @@ class JournalEntry(db.Model):
     
     def __init__(self, **kwargs):
         self.user_id = kwargs.get("user_id")
-        self.datetime_created = kwargs.get("datetime_created") or datetime.now()
+        self.entry_id = kwargs.get("entry_id")
+        self.datetime_created = kwargs.get("datetime_created")
         self.title = kwargs.get("title", "N/A")
         self.summary = kwargs.get("summary", "N/A")
         self.transcription = kwargs.get("transcription", "N/A")
