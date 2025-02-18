@@ -1,4 +1,15 @@
 from fastapi import APIRouter
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
+
+load_dotenv("../../.env")
+load_dotenv("../../constants.env")
+
+
+client_type = os.getenv("CLIENT_TYPE")
+
+
 
 router = APIRouter()
 
