@@ -9,17 +9,25 @@ class User(db.Model):
     """
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    created_at = db.Column(db.DateTime, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    created_dt = db.Column(db.DateTime, nullable=False)
     
     journal_entries = db.relationship("JournalEntry", back_populates="user")
 
     def __init__(self, **kwargs):
-        self.created_at = datetime.now()
+        self.created_dt = datetime.now()
+        self.name = kwargs.get("name")
+        self.email = kwargs.get("email")
+        self.password = kwargs.get("password")
 
     def serialize(self):
         return {
             "id": self.id,
-            "created_at": self.created_at
+            "email": self.email,
+            "name": self.name,
+            "created_at": self.created_dt
         }
         
 class JournalEntry(db.Model):
@@ -33,7 +41,8 @@ class JournalEntry(db.Model):
     
     entry_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    datetime_created = db.Column(db.DateTime, nullable=False)
+    dt_created = db.Column(db.DateTime, nullable=False)
+    recording_url = db.Column(db.String, nullable=False)
     
     # Add after analysis
     title = db.Column(db.String, nullable=True, default="N/A")
