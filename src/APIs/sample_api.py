@@ -41,17 +41,6 @@ elif client_type == "GEMINI":
                 api_key=os.getenv("GEMINI_API_KEY")
         )
         
-        print("Waiting on Gemini response...")
-        
-        response = client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents= test_content,
-        )
-
-        
-        print(response.text)
-                
-        
 
 # ROUTES ------------------------------------------------------------
 
@@ -60,6 +49,17 @@ router = APIRouter()
 @router.get("/")
 def get_users():
     return [{"username": "alice"}, {"username": "bob"}]
+
+@router.get("/test")
+def test():
+        print("Waiting on Gemini response...")
+                
+        response = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents= test_content,
+        )
+                
+        return response.text
 
 @router.get("/{user_id}")
 def get_user(user_id: int):
