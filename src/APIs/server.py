@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from transcription import router as transcription_router
 from sample_api import router as sample_router
 from file_storage_s3 import router as file_storage_router
+from insights import router as insights_router
 from dotenv import load_dotenv
 import os
 
@@ -17,6 +18,7 @@ app = FastAPI()
 app.include_router(sample_router, prefix="/test_dev", tags=["test_dev"])
 app.include_router(transcription_router, prefix="/transcript", tags=["transcript"])
 app.include_router(file_storage_router, prefix="/storage", tags=["storage"])
+app.include_router(insights_router, prefix="/api", tags=["insights"])
 
 # Run the application if executed directly
 if __name__ == "__main__":

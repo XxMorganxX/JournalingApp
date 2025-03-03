@@ -5,6 +5,15 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import os
 from google import genai
+from google.genai import types
+from datetime import datetime
+
+
+# Router ----------------------------------------------------------------------
+
+router = APIRouter(prefix="/insights", tags=["insights"])
+
+
 
 # Create a Pydantic model for the request body
 class InsightRequest(BaseModel):
@@ -18,7 +27,6 @@ load_dotenv("../../constants.env")
 # Test Parameters ------------------------------------------------------------
 
 client_type = os.getenv("CLIENT_TYPE")
-test_content = "Explain how AI works"
 
 # Models ------------------------------------------------------------
 
@@ -47,7 +55,9 @@ elif client_type == "GEMINI":
         )
         
         
-router = APIRouter(prefix="/insights", tags=["insights"])
+
+
+
 
 @router.post("/generate_insights")
 async def generate_insights(request: InsightRequest):
@@ -89,22 +99,26 @@ async def generate_insights(request: InsightRequest):
         if client_type == "GEMINI":
                 response = client.models.generate_content(
                         model="gemini-2.0-flash",
-                        contents= Audio_transcription,
-                        system_instruction= "You are a helpful therapist assistant that generates insights from a users journal entry audio transcription. Pull out the most important insights to be stored as headers and summarize them in a concise manner.",
-                        generate_config={
-                                "temperature": 0.7,        # 0.0 to 1.0: Lower = more focused, Higher = more creative
-                                "top_p": 0.95,            # 0.0 to 1.0: Nucleus sampling threshold
-                                "top_k": 40,              # Top K tokens to consider
-                                "max_output_tokens": 2048,
-                                "response_mime_type": "application/json",
-                                "response_schema": response_schema,
-                        },
-                        
-                        
-                        
+                        contents=[
+                            "Pull out the most important insights to be stored as headers and summarize them in a concise manner.",
+                            Audio_transcription
+                        ],
+                        config=types.GenerateContentConfig(
+                                system_instruction="You are a helpful therapist assistant that generates insights from a users journal entry audio transcription.",
+                                temperature= 0.7,        # 0.0 to 1.0: Lower = more focused, Higher = more creative
+                                top_p= 0.95,            # 0.0 to 1.0: Nucleus sampling threshold
+                                top_k= 40,              # Top K tokens to consider
+                                max_output_tokens= 2048,
+                                response_mime_type= "application/json",
+                                response_schema= response_schema,
+                        ),
                 )
-                
-                return response.text
+                return response
             
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": str(e), "datatime": datetime.now().isoformat()}
+
+
+
+
+
