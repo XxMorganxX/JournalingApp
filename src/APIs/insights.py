@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Body
 from pydantic import BaseModel
 from typing import Optional
+from google import genai
+from google.generativeai import types
+
+from datetime import datetime
 from dotenv import load_dotenv
 from openai import OpenAI
 import os
-from google import genai
-from google.genai import types
-from datetime import datetime
-
 
 # Router ----------------------------------------------------------------------
 
@@ -20,8 +20,8 @@ class InsightRequest(BaseModel):
     text: str
     options: Optional[dict] = None
 
-load_dotenv("../../.env")
-load_dotenv("../../constants.env")
+load_dotenv(".env")
+load_dotenv("constants.env")
 
 
 # Test Parameters ------------------------------------------------------------
@@ -30,7 +30,7 @@ client_type = os.getenv("CLIENT_TYPE")
 
 # Models ------------------------------------------------------------
 
-client = None
+CLIENT = None
 
 if client_type is None:
         raise ValueError("Client type is not set")
@@ -50,7 +50,7 @@ elif client_type == "OPENAI":
         )
 
 elif client_type == "GEMINI":
-        client = genai.Client(
+        CLIENT = genai.Client(
                 api_key=os.getenv("GEMINI_API_KEY")
         )
         
@@ -77,40 +77,59 @@ async def generate_insights(request: InsightRequest):
     Audio_transcription = request.text
     
     response_schema = {
-        "description": "A list of responses, each with a headline and subtext",
+        "description": "A list of responses containing insights and reminders",
         "type": "array",
         "items": {
             "type": "object",
             "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": ["insight", "reminder"],
+                    "description": "Whether this item is an insight or a reminder"
+                },
                 "headline": {
                     "type": "string",
-                    "description": "The main headline."
+                    "description": "The main headline or reminder title"
                 },
                 "subtext": {
                     "type": "string",
-                    "description": "Supporting subtext."
+                    "description": "Supporting subtext or reminder details"
+                },
+                "date": {
+                    "type": "string",
+                    "description": "ISO format date for reminders, if mentioned",
+                    "format": "date-time"
                 }
             },
-            "required": ["headline", "subtext"]
+            "required": ["type", "headline", "subtext"]
         }
     }
     
     try:
         if client_type == "GEMINI":
-                response = client.models.generate_content(
+                response = CLIENT.models.generate_content(
                         model="gemini-2.0-flash",
                         contents=[
-                            "Pull out the most important insights to be stored as headers and summarize them in a concise manner.",
+                            """Analyze this text for two types of information:
+                            1. Important psychological insights and themes
+                            2. Any mentioned future events, appointments, or tasks that should be remembered
+                            
+                            For insights: Pull out the most important psychological insights and summarize them.
+                            For reminders: If any future events, tasks, or appointments are mentioned, extract them with their dates/times.
+                            """,
                             Audio_transcription
                         ],
                         config=types.GenerateContentConfig(
-                                system_instruction="You are a helpful therapist assistant that generates insights from a users journal entry audio transcription.",
-                                temperature= 0.7,        # 0.0 to 1.0: Lower = more focused, Higher = more creative
-                                top_p= 0.95,            # 0.0 to 1.0: Nucleus sampling threshold
-                                top_k= 40,              # Top K tokens to consider
-                                max_output_tokens= 2048,
-                                response_mime_type= "application/json",
-                                response_schema= response_schema,
+                                system_instruction="""You are a helpful therapist assistant that:
+                                1. Generates psychological insights from journal entries
+                                2. Identifies and extracts any mentioned future events or tasks
+                                Be precise with dates and times when mentioned.""",
+                                temperature=0.7,
+                                top_p=0.95,
+                                top_k=40,
+                                max_output_tokens=2048,
+                                response_mime_type="application/json",
+                                response_schema=response_schema,
                         ),
                 )
                 return response
