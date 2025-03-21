@@ -1,11 +1,17 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
+
+press1 = False
 st.title("Streamlit Calendar Example")
 
 # Initialize session state for events if it doesn't exist
 if 'calendar_events' not in st.session_state:
     st.session_state.calendar_events = []
+
+# Initialize press state if it doesn't exist
+if 'press1' not in st.session_state:
+    st.session_state.press1 = False
 
 # HTML and JavaScript code for FullCalendar
 html_string = """
@@ -149,20 +155,46 @@ html_string = html_string.replace('INIT_EVENTS', str(st.session_state.calendar_e
 # Embed the calendar
 components.html(html_string, height=600)
 
-# Example button to trigger event updates
-if st.button('Update Calendar'):
-    custom_events = [
+custom_event = [
         {
-            'title': 'Test #1',
+            'title': 'Test #3',
             'start': '2025-03-15',
             'backgroundColor': '#FF5733',
             'url': 'https://example.com/team-meeting'
         },
-        {
-            'title': 'Test #2',
-            'start': '2025-03-25',
-            'backgroundColor': '#C70039',
-            'url': 'https://example.com/workshop'
-        }
     ]
-    update_calendar_events(custom_events)
+
+# Example button to trigger event updates
+if st.button('Update Calendar'):
+    
+    if not st.session_state.press1:
+      print("First Press")
+      st.session_state.press1 = True
+      custom_events = [
+          {
+              'title': 'Test #1',
+              'start': '2025-03-15',
+              'backgroundColor': '#FF5733',
+              'url': 'https://example.com/team-meeting'
+          },
+          {
+              'title': 'Test #2',
+              'start': '2025-03-25',
+              'backgroundColor': '#C70039',
+              'url': 'https://example.com/workshop'
+          }
+      ]
+      update_calendar_events(custom_events)
+    
+    elif st.session_state.press1:
+      print("Second Press")
+      custom_events = [
+          {
+              'title': 'Test #1',
+              'start': '2025-03-15',
+              'backgroundColor': '#FF5733',
+              'url': 'https://example.com/team-meeting'
+          },
+      ]
+      update_calendar_events(custom_events)
+    

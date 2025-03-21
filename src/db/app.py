@@ -4,6 +4,7 @@ from db import db, User, JournalEntry
 from datetime import datetime
 from json import JSONEncoder
 import json
+from flask_bcrypt import Bcrypt
 
 import os
 
@@ -34,6 +35,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_filename}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
 
+# Initialize Bcrypt
+bcrypt = Bcrypt(app)
 
 # initialize app
 db.init_app(app)

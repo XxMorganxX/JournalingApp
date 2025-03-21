@@ -50,6 +50,8 @@ class JournalEntry(db.Model):
     transcription = db.Column(db.String, nullable=True, default="N/A")
     key_insights = db.Column(db.String, nullable=True, default="N/A")
     
+    
+    
     # Add relationship to user
     user = db.relationship("User", back_populates="journal_entries")
     
